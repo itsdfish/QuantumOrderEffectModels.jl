@@ -2,43 +2,41 @@ abstract type AbstractQOEM  <: ContinuousUnivariateDistribution end
 
 """
 
-    QOEM{T<:Real} <: AbstractQOEM
+    QOEM{T<:Real,V<:AbstractVector{T}} <: AbstractQOEM
 
-A model object for the Quantum Prisoner's Dilemma Model. The QOEM has four basis states:
+A model object for a quantum model for medical diagnosis. 
     
-1. opponent defects and you defect 
-2. opponent defects and you cooperate 
-3. opponent cooperates and you defect 
-4. opponent cooperates and you cooperate
+# Basis vectors
 
-The bases are orthonormal and in standard form. The model assumes three conditions:
+A person's cognitive state Ψ is represented in a 4D belief space where basis vectors correspond to 
+hypotheses and evidence states: 
 
-1. Player 2 is told that player 1 defected
-2. Player 2 is told that player 1 cooperated
-3. Player 2 is not informed of the action of player 1
-
-
-Model inputs and outputs are assumed to be in the order above. 
+1. disease present and positive evidence 
+2. disease present and negative evidence 
+3. disease absent and positive evidence 
+4. disease present and negative evidence 
 
 # Fields 
 
-- `μd`: utility for defecting 
-- `μc`: utility for cooperating 
-- `γ`: entanglement parameter for beliefs and actions 
+- `Ψ::V`: initial state vector (superposition)
+- `γₚ::T`: rotation for positive evidence 
+- `γₙ::T`: rotation for negative evidence
 
 # Example 
 
 ```julia
-using QuantumPrisonersDilemmaModel
-model = QOEM(;μd=.51, γ=2.09)
+Ψ = [√(.676 / 2),√(.676 / 2),√(.324 / 2),√(.324 / 2)]
+γₚ = 4.4045 / √(.5)
+γₙ = 0.3306 / √(.5)
+dist = QOEM(;Ψ, γₚ, γₙ)
 ```
 
 # References 
 
 Trueblood, J. S., & Busemeyer, J. R. (2011). A quantum probability account of order effects in inference. Cognitive science, 35(8), 1518-1552.
 """
-struct QOEM{T<:Real} <: AbstractQOEM
-    Ψ::AbstractVector{<:T}
+struct QOEM{T<:Real,V<:AbstractVector{T}} <: AbstractQOEM
+    Ψ::V
     γₚ::T 
     γₙ::T
 end

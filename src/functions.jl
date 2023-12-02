@@ -1,7 +1,8 @@
 """
-    predict(dist::AbstractQOEM; t = π / 2)
+    predict(dist::AbstractQOEM; t = 1)
 
 Returns predicted response probability for the following conditions:
+
     
 # Arguments
 
@@ -9,7 +10,7 @@ Returns predicted response probability for the following conditions:
 
 # Keywords
 
-- `t = π / 2`: time of decision
+- `t = 1`: time of decision
 
 # Example 
 
@@ -21,10 +22,11 @@ predict(model)
 """
 function predict(dist::AbstractQOEM; t = 1.0)
     (;Ψ, γₚ, γₙ) = dist
+
     H1 = make_H1(dist)
     H2 = make_H2(dist)
     
-    H = H1 .+ H2
+    H = √(1/2) .* (H1 .+ H2)
     # unitary transformation matrix from initial state to 
     # positive evidence
     Upi = exp(-im * t * γₚ * H)
@@ -64,7 +66,7 @@ function predict(dist::AbstractQOEM; t = 1.0)
     prob_dgpn = real(proj_d'* proj_d)
     
     # initial state in terms of negative evidence
-    Ψp = Uni * Ψ
+    Ψn = Uni * Ψ
     # state projected onto observed negative evidence
     Ψn′ = Pn * Ψn
     # update/normalize the state
@@ -101,7 +103,7 @@ make_H1(dist::AbstractQOEM) = kron(I(2), [1. 1; 1 -1])
 
 
 """
-    make_H2(γ)
+    make_H2(dist::AbstractQOEM)
 
 # Arguments 
 
@@ -114,10 +116,10 @@ function make_H2(dist::AbstractQOEM)
     return H
 end
 
-rand(dist::AbstractQOEM; t = π / 2) = rand(dist, 1; t = π / 2)
+rand(dist::AbstractQOEM; t = 1) = rand(dist, 1; t = 1)
 
 """
-    rand(dist::AbstractQOEM, n::Int; t = π / 2)
+    rand(dist::AbstractQOEM, n::Int; t = 1)
 
 Generates simulated data for the following conditions:
 
@@ -132,7 +134,7 @@ Generates simulated data for the following conditions:
 
 # Keywords
 
-- `t = π / 2`: time of decision
+- `t = 1`: time of decision
 
 # Example 
 
@@ -148,7 +150,7 @@ function rand(dist::AbstractQOEM, n::Int; t = π / 2)
 end
 
 """
-    pdf(dist::AbstractQOEM, n::Int, n_d::Vector{Int}; t = π / 2)
+    pdf(dist::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1)
 
 Returns the joint probability density given data for the following conditions:
 
@@ -165,15 +167,15 @@ Returns the joint probability density given data for the following conditions:
 
 # Keywords
 
-- `t = π / 2`: time of decision
+- `t = 1`: time of decision
 """
-function pdf(dist::AbstractQOEM, n::Int, n_d::Vector{Int}; t = π / 2)
+function pdf(dist::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1)
     Θ = predict(dist; t)
     return prod(@. pdf(Binomial(n, Θ), n_d)) 
 end
 
 """
-    logpdf(dist::AbstractQOEM, n::Int, n_d::Vector{Int}; t = π / 2)
+    logpdf(dist::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1)
 
 Returns the joint log density given data for the following conditions:
 
@@ -189,7 +191,7 @@ Returns the joint log density given data for the following conditions:
 
 # Keywords
 
-- `t = π / 2`: time of decision
+- `t = 1: time of decision
 
 # Example 
 
@@ -201,7 +203,7 @@ data = rand(model, n_trials)
 logpdf(model, n_trials, data)
 ```
 """
-function logpdf(dist::AbstractQOEM, n::Int, n_d::Vector{Int}; t = π / 2)
+function logpdf(dist::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1)
     Θ = predict(dist; t)
     return sum(@. logpdf(Binomial(n, Θ), n_d))
 end
