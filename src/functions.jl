@@ -1,30 +1,44 @@
 """
-    predict(dist::AbstractQOEM; t = 1)
+    predict(model::AbstractQOEM; t = 1)
 
 Returns predicted response probability for the following conditions:
 
     
 # Arguments
 
-- `dist::AbstractQOEM`
+- `model::AbstractQOEM`
 
 # Keywords
 
 - `t = 1`: time of decision
 
+# Output 
+
+The output is a vector of predictions corresponding to the following conditions:
+
+1. Pr(disease)
+2. Pr(disease | positive)
+3. Pr(disease | positive, negative)
+4. Pr(disease | negative)
+5. Pr(disease | negative, positive)
+
 # Example 
 
 ```julia 
-using QuantumPrisonersDilemmaModel 
-model = QPDM(;μd=.51, γ=2.09)
+using QuantumOrderEffectModels
+Ψ = @. √([.35,.35,.15,.15])
+γₚ = 2
+γₙ = .5
+σ = .10
+model = QOEM(;Ψ, γₚ, γₙ, σ)
 predict(model)
 ```
 """
-function predict(dist::AbstractQOEM; t = 1.0)
-    (;Ψ, γₚ, γₙ) = dist
+function predict(model::AbstractQOEM; t = 1.0)
+    (;Ψ, γₚ, γₙ) = model
 
-    H1 = make_H1(dist)
-    H2 = make_H2(dist)
+    H1 = make_H1(model)
+    H2 = make_H2(model)
     
     H = √(1/2) .* (H1 .+ H2)
     # unitary transformation matrix from initial state to 
@@ -89,47 +103,47 @@ function predict(dist::AbstractQOEM; t = 1.0)
 end
 
 """
-    make_H1(dist::AbstractQOEM)
+    make_H1(model::AbstractQOEM)
 
-Creates a Hermitian matrix which rotates in favor of defecting or cooperating depending on 
-μd and μd. 
-
-# Arguments 
-
-- `μd`: utility for defecting 
-- `μc`: utility for cooperating
-"""
-make_H1(dist::AbstractQOEM) = kron(I(2), [1. 1; 1 -1])
-
-
-"""
-    make_H2(dist::AbstractQOEM)
+Creates a Hermitian matrix which rotates 
 
 # Arguments 
 
-- `γ`: entanglement parameter which aligns beliefs and actions
+- `model::AbstractQOEM`: a model object for a quantum order effect model 
 """
-function make_H2(dist::AbstractQOEM)
+make_H1(model::AbstractQOEM) = kron(I(2), [1. 1; 1 -1])
+
+
+"""
+    make_H2(model::AbstractQOEM)
+
+# Arguments 
+
+- `model::AbstractQOEM`: a model object for a quantum order effect model 
+"""
+function make_H2(model::AbstractQOEM)
     H = kron(fill(1.0, 2, 2), I(2))
     H[2,2] = -1.0
     H[3,3] = -1.0
     return H
 end
 
-rand(dist::AbstractQOEM; t = 1) = rand(dist, 1; t = 1)
+rand(model::AbstractQOEM; t = 1) = rand(model, 1; t = 1)
 
 """
-    rand(dist::AbstractQOEM, n::Int; t = 1)
+    rand(model::AbstractQOEM, n::Int; t = 1)
 
 Generates simulated data for the following conditions:
 
-1. Player 2 is told that player 1 defected
-2. Player 2 is told that player 1 cooperated
-3. Player 2 is not informed of player 1's action
+1. Pr(disease)
+2. Pr(disease | positive)
+3. Pr(disease | positive, negative)
+4. Pr(disease | negative)
+5. Pr(disease | negative, positive)
 
 # Arguments
 
-- `dist::AbstractQOEM`
+- `model::AbstractQOEM`: a model object for a quantum order effect model 
 - `n`: the number of trials per condition 
 
 # Keywords
@@ -139,29 +153,36 @@ Generates simulated data for the following conditions:
 # Example 
 
 ```julia 
-using QuantumPrisonersDilemmaModel 
-model = QPDM(;μd=.51, γ=2.09)
+Ψ = @. √([.35,.35,.15,.15])
+γₚ = 2
+γₙ = .5
+σ = .10
+model = QOEM(;Ψ, γₚ, γₙ, σ)
 data = rand(model, 100)
 ```
 """
-function rand(dist::AbstractQOEM, n::Int; t = π / 2)
-    Θ = predict(dist; t)
-    return @. rand(Binomial(n, Θ))
+function rand(model::AbstractQOEM, n::Int; t = 1)
+    μs = predict(model; t)
+    σ = model.σ
+    θ = to_beta.(μs, [σ])
+    f(Θ) = map(θ -> round_val(rand(Beta(θ...)), .05), Θ)
+    return [f(θ) for _ ∈ 1:n]
 end
 
 """
-    pdf(dist::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1)
+    pdf(model::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1)
 
 Returns the joint probability density given data for the following conditions:
 
-1. Player 2 is told that player 1 defected
-2. Player 2 is told that player 1 cooperated
-3. Player 2 is not informed of player 1's action
-    
+1. Pr(disease)
+2. Pr(disease | positive)
+3. Pr(disease | positive, negative)
+4. Pr(disease | negative)
+5. Pr(disease | negative, positive)  
 
 # Arguments
 
-- `dist::AbstractQOEM`
+- `model::AbstractQOEM`: a model object for a quantum order effect model 
 - `n`: the number of trials per condition 
 - `n_d`: the number of defections in each condition 
 
@@ -169,23 +190,26 @@ Returns the joint probability density given data for the following conditions:
 
 - `t = 1`: time of decision
 """
-function pdf(dist::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1)
-    Θ = predict(dist; t)
+function pdf(model::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1)
+    Θ = predict(model; t)
     return prod(@. pdf(Binomial(n, Θ), n_d)) 
 end
 
 """
-    logpdf(dist::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1)
+    logpdf(model::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1)
 
 Returns the joint log density given data for the following conditions:
 
-1. Player 2 is told that player 1 defected
-2. Player 2 is told that player 1 cooperated
-3. Player 2 is not informed of player 1's action
+1. Pr(disease)
+2. Pr(disease | positive)
+3. Pr(disease | positive, negative)
+4. Pr(disease | negative)
+5. Pr(disease | negative, positive)  
+    
 
 # Arguments
 
-- `dist::AbstractQOEM`
+- `model::AbstractQOEM`: a model object for a quantum order effect model 
 - `n`: the number of trials per condition 
 - `n_d`: the number of defections in each condition 
 
@@ -196,18 +220,29 @@ Returns the joint log density given data for the following conditions:
 # Example 
 
 ```julia 
-using QuantumPrisonersDilemmaModel 
+using QuantumOrderEffectModels 
 model = QPDM(;μd=.51, γ=2.09)
 n_trials = 100
 data = rand(model, n_trials)
 logpdf(model, n_trials, data)
 ```
 """
-function logpdf(dist::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1)
-    Θ = predict(dist; t)
+function logpdf(model::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1)
+    Θ = predict(model; t)
     return sum(@. logpdf(Binomial(n, Θ), n_d))
 end
 
 loglikelihood(d::AbstractQOEM, data::Tuple) = logpdf(d, data...)
 
-logpdf(dist::AbstractQOEM, x::Tuple) = logpdf(dist, x...)
+logpdf(model::AbstractQOEM, x::Tuple) = logpdf(model, x...)
+
+function round_val(p, r) 
+    v = 1 / r 
+    return round(p * v) / v
+end
+
+function to_beta(μ, σ)
+    α = ((1 - μ) / σ^2 - (1 / μ)) * μ^2
+    β = α * ((1 / μ) - 1)
+    return α, β
+end

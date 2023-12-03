@@ -1,6 +1,6 @@
 module QuantumOrderEffectModels
 
-    using Distributions: Binomial
+    using Distributions: Beta
     using Distributions: ContinuousUnivariateDistribution
     using LinearAlgebra
 

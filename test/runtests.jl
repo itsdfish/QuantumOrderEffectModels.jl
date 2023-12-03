@@ -7,16 +7,34 @@ using SafeTestsets
     Ψ = [√(.676 / 2),√(.676 / 2),√(.324 / 2),√(.324 / 2)]
     γₚ = 4.4045 / √(.5)
     γₙ = 0.3306 / √(.5)
-    dist = QOEM(;Ψ, γₚ, γₙ)
+    σ = .10
+    dist = QOEM(;Ψ, γₚ, γₙ, σ)
     preds = predict(dist)
     true_preds = [ 0.676, 0.793, 0.504, 0.437, 0.59]
 
     @test preds ≈ true_preds atol = 1e-3
 end
 
+@safetestset "to_beta" begin
+    using Distributions
+    using QuantumOrderEffectModels
+    using QuantumOrderEffectModels: to_beta
+    using Test
+    
+    α = 2
+    β = 3 
+    dist = Beta(α, β)
+    μ = mean(dist)
+    σ = std(dist)
+    α′,β′ = to_beta(μ, σ)
+
+    @test α ≈ α′
+    @test β ≈ β′
+end
+
 # @safetestset "rand" begin
 #     @safetestset "rand 1" begin
-#         using QuantumPrisonersDilemmaModel
+#         using QuantumOrderEffectModels
 #         using Test
 #         using Random 
 
@@ -31,7 +49,7 @@ end
 #     end
 
 #     @safetestset "rand 2" begin
-#         using QuantumPrisonersDilemmaModel
+#         using QuantumOrderEffectModels
 #         using Test
 #         using Random 
 
@@ -47,8 +65,8 @@ end
 # end
 
 # @safetestset "H1" begin
-#     using QuantumPrisonersDilemmaModel
-#     using QuantumPrisonersDilemmaModel: make_H1
+#     using QuantumOrderEffectModels
+#     using QuantumOrderEffectModels: make_H1
 #     using Test
 
 #     H1 = make_H1(1.5, 2)
@@ -60,8 +78,8 @@ end
 # end
 
 # @safetestset "H2" begin
-#     using QuantumPrisonersDilemmaModel
-#     using QuantumPrisonersDilemmaModel: make_H2
+#     using QuantumOrderEffectModels
+#     using QuantumOrderEffectModels: make_H2
 #     using Test
 
 #     H2 = make_H2(√(2) * 2)
@@ -76,7 +94,7 @@ end
 # end
 
 # @safetestset "logpdf" begin
-#     using QuantumPrisonersDilemmaModel
+#     using QuantumOrderEffectModels
 #     using Test
 #     using Random 
 
@@ -102,7 +120,7 @@ end
 # end
 
 # @safetestset "pdf" begin
-#     using QuantumPrisonersDilemmaModel
+#     using QuantumOrderEffectModels
 #     using Distributions
 #     using Test
 #     using Random 

@@ -14,13 +14,14 @@ hypotheses and evidence states:
 1. disease present and positive evidence 
 2. disease present and negative evidence 
 3. disease absent and positive evidence 
-4. disease present and negative evidence 
+4. disease absent and negative evidence 
 
 # Fields 
 
 - `Ψ::V`: initial state vector (superposition)
 - `γₚ::T`: rotation for positive evidence 
 - `γₙ::T`: rotation for negative evidence
+- `σ::T`: the standard deviation of probability judgments
 
 # Example 
 
@@ -28,7 +29,9 @@ hypotheses and evidence states:
 Ψ = [√(.676 / 2),√(.676 / 2),√(.324 / 2),√(.324 / 2)]
 γₚ = 4.4045 / √(.5)
 γₙ = 0.3306 / √(.5)
-dist = QOEM(;Ψ, γₚ, γₙ)
+σ = .10
+model = QOEM(;Ψ, γₚ, γₙ, σ)
+predict(model)
 ```
 
 # References 
@@ -39,12 +42,13 @@ struct QOEM{T<:Real,V<:AbstractVector{T}} <: AbstractQOEM
     Ψ::V
     γₚ::T 
     γₙ::T
+    σ::T
 end
 
-QOEM(;Ψ, γₚ, γₙ) = QOEM(Ψ, γₚ, γₙ)
+QOEM(;Ψ, γₚ, γₙ, σ) = QOEM(Ψ, γₚ, γₙ, σ)
 
-function QOEM(Ψ, γₚ, γₙ)
-    _, γₚ, γₙ = promote(Ψ[1], γₚ, γₙ)
+function QOEM(Ψ, γₚ, γₙ, σ)
+    _, γₚ, γₙ, σ = promote(Ψ[1], γₚ, γₙ, σ)
     Ψ = convert(Vector{typeof(γₚ)}, Ψ)
-    return QOEM(Ψ, γₚ, γₙ)
+    return QOEM(Ψ, γₚ, γₙ, σ)
 end
