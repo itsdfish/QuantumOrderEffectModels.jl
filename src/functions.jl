@@ -2,7 +2,6 @@
     predict(model::AbstractQOEM; t = 1)
 
 Returns predicted response probability for the following conditions:
-
     
 # Arguments
 
@@ -29,7 +28,7 @@ using QuantumOrderEffectModels
 Ψ = @. √([.35,.35,.15,.15])
 γₚ = 2
 γₙ = .5
-σ = .10
+σ = .05
 model = QOEM(;Ψ, γₚ, γₙ, σ)
 predict(model)
 ```
@@ -39,13 +38,11 @@ function predict(model::AbstractQOEM; t = 1.0)
 
     H1 = make_H1(model)
     H2 = make_H2(model)
-    
     H = √(1/2) .* (H1 .+ H2)
-    # unitary transformation matrix from initial state to 
-    # positive evidence
+
+    # unitary transformation matrix for positive evidence
     Upi = exp(-im * t * γₚ * H)
-    # unitary transformation matrix from initial state to 
-    # positive evidence
+    # unitary transformation matrix for positive evidence
     Uni = exp(-im * t * γₙ * H)
     
     #  projector for positive evidence
@@ -59,45 +56,41 @@ function predict(model::AbstractQOEM; t = 1.0)
     proj_d = Pd * Ψ
     prob_d = proj_d' * proj_d
     
-    # initial state in terms of positive evidence
-    Ψp = Upi * Ψ
     # state projected onto observed positive evidence
-    Ψp′ = Pp * Ψp
+    Ψp = Pp * Upi * Ψ
     # update/normalize the state
-    Ψp′ = Ψp′ ./ norm(Ψp′)
+    Ψp = Ψp ./ norm(Ψp)
     # projection onto disease present basis
-    proj_d = Pd * Ψp′
+    proj_d = Pd * Ψp
     # probability of disease given positive evidence 
     prob_dgp = real(proj_d'* proj_d)
     
-    # unitary transformsations: initial to positive, then to negative
-    Ψpn = Uni * Upi'* Ψp′
-    Ψpn′ = Pn * Ψpn
-    Ψpn′ = Ψpn′ ./ norm(Ψpn′)
-    # projection onto disease present basis
-    proj_d = Pd * Ψpn′
-    # probability of disease given positive evidence then negative evidence
-    prob_dgpn = real(proj_d'* proj_d)
-    
-    # initial state in terms of negative evidence
-    Ψn = Uni * Ψ
-    # state projected onto observed negative evidence
-    Ψn′ = Pn * Ψn
+    # project onto negative evidence basis
+    Ψpn = Pn * Uni * Upi'* Ψp
     # update/normalize the state
-    Ψn′ = Ψn′ ./ norm(Ψn′)
+    Ψpn = Ψpn ./ norm(Ψpn)
     # projection onto disease present basis
-    proj_d = Pd * Ψn′
-    # probability of disease given negative evidence 
-    prob_dgn = real(proj_d'* proj_d)
+    proj_d = Pd * Ψpn
+    # probability of disease given positive evidence then negative evidence
+    prob_dgpn = real(proj_d' * proj_d)
     
-    # unitary transformsations: initial to negative, then to positive
-    Ψpp = Upi * Uni'* Ψn′
-    Ψpp′ = Pp * Ψpp
-    Ψpp′ = Ψpp′ ./ norm(Ψpp′)
+    # state projected onto observed negative evidence
+    Ψn = Pn * Uni * Ψ
+    # update/normalize the state
+    Ψn = Ψn ./ norm(Ψn)
     # projection onto disease present basis
-    proj_d = Pd * Ψpp′
+    proj_d = Pd * Ψn
+    # probability of disease given negative evidence 
+    prob_dgn = real(proj_d' * proj_d)
+    
+    # unitary transformsations: negative to initial, then to positive
+    Ψnp = Pp * Upi * Uni'* Ψn
+    # update/normalize the state
+    Ψnp = Ψnp ./ norm(Ψnp)
+    # projection onto disease present basis
+    proj_d = Pd * Ψnp
     # probability of disease given negative and then positive evidence 
-    prob_dgnp = real(proj_d'* proj_d)
+    prob_dgnp = real(proj_d' * proj_d)
     
     return [prob_d, prob_dgp, prob_dgpn, prob_dgn, prob_dgnp]    
 end
@@ -113,7 +106,6 @@ Creates a Hermitian matrix which rotates
 """
 make_H1(model::AbstractQOEM) = kron(I(2), [1. 1; 1 -1])
 
-
 """
     make_H2(model::AbstractQOEM)
 
@@ -128,10 +120,10 @@ function make_H2(model::AbstractQOEM)
     return H
 end
 
-rand(model::AbstractQOEM; t = 1) = rand(model, 1; t = 1)
+rand(model::AbstractQOEM; t = 1, r = .05) = rand(model, 1; t, r)
 
 """
-    rand(model::AbstractQOEM, n::Int; t = 1)
+    rand(model::AbstractQOEM, n::Int; t = 1, r = .05)
 
 Generates simulated data for the following conditions:
 
@@ -156,21 +148,21 @@ Generates simulated data for the following conditions:
 Ψ = @. √([.35,.35,.15,.15])
 γₚ = 2
 γₙ = .5
-σ = .10
+σ = .05
 model = QOEM(;Ψ, γₚ, γₙ, σ)
 data = rand(model, 100)
 ```
 """
-function rand(model::AbstractQOEM, n::Int; t = 1)
+function rand(model::AbstractQOEM, n::Int; t = 1, r = .05)
     μs = predict(model; t)
     σ = model.σ
     θ = to_beta.(μs, [σ])
-    f(Θ) = map(θ -> round_val(rand(Beta(θ...)), .05), Θ)
+    f(Θ) = map(θ -> round_val(rand(Beta(θ...)), r), Θ)
     return [f(θ) for _ ∈ 1:n]
 end
 
 """
-    pdf(model::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1)
+    pdf(model::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1, r = .05)
 
 Returns the joint probability density given data for the following conditions:
 
@@ -190,13 +182,13 @@ Returns the joint probability density given data for the following conditions:
 
 - `t = 1`: time of decision
 """
-function pdf(model::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1)
+function pdf(model::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1, r = .05)
     Θ = predict(model; t)
     return prod(@. pdf(Binomial(n, Θ), n_d)) 
 end
 
 """
-    logpdf(model::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1)
+    logpdf(model::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1, r = .05)
 
 Returns the joint log density given data for the following conditions:
 
@@ -206,7 +198,6 @@ Returns the joint log density given data for the following conditions:
 4. Pr(disease | negative)
 5. Pr(disease | negative, positive)  
     
-
 # Arguments
 
 - `model::AbstractQOEM`: a model object for a quantum order effect model 
@@ -227,7 +218,7 @@ data = rand(model, n_trials)
 logpdf(model, n_trials, data)
 ```
 """
-function logpdf(model::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1)
+function logpdf(model::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1, r = .05)
     Θ = predict(model; t)
     return sum(@. logpdf(Binomial(n, Θ), n_d))
 end
