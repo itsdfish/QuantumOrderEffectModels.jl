@@ -73,3 +73,46 @@ end
         @test fill(σ, 5) ≈ std(data) rtol = .01
     end
 end
+
+@safetestset "get_bounds" begin
+    using QuantumOrderEffectModels: get_bounds
+    using Test
+
+    lb,ub = get_bounds(.4, .05)
+    @test lb ≈ .375
+    @test ub ≈ .425
+
+    lb,ub = get_bounds(.0, .05)
+    @test lb ≈ .0
+    @test ub ≈ .025
+
+    lb,ub = get_bounds(1, .05)
+    @test lb ≈ .975
+    @test ub ≈ 1
+end
+
+@safetestset "logpdf" begin
+    using QuantumOrderEffectModels
+    using Random
+    using Test
+
+    Random.seed!(584)
+
+    Θ = (Ψ = [√(.676 / 2),√(.676 / 2),√(.324 / 2),√(.324 / 2)],
+        γₚ = 4.0,
+        γₙ = 2.0, 
+        σ = .05)
+    dist = QOEM(;Θ...)
+    r = .05
+    data = rand(dist, 10_000; r)
+
+    γₚs = range(Θ.γₚ * .80, Θ.γₚ * 1.20, length = 100)
+    LLs = map(γₚ -> logpdf(QOEM(;Θ..., γₚ), data; r), γₚs)
+    _,max_idx = findmax(LLs)
+    @test_skip γₚs[max_idx] ≈ Θ.γₚ rtol = .01
+
+    γₙs = range(Θ.γₙ * .80, Θ.γₙ * 1.20, length = 100)
+    LLs = map(γₙ -> logpdf(QOEM(;Θ..., γₙ), data), γₙs)
+    _,max_idx = findmax(LLs)
+    @test_skip γₙs[max_idx] ≈ Θ.γₙ rtol = .01
+end

@@ -1,9 +1,9 @@
 using Documenter
-using QuantumPrisonersDilemmaModel
+using QuantumOrderEffectModels
 
 makedocs(
     warnonly = true,
-    sitename="QuantumPrisonersDilemmaModel",
+    sitename="QuantumOrderEffectModels",
     format=Documenter.HTML(
         assets=[
             asset(
@@ -14,7 +14,7 @@ makedocs(
         collapselevel=1,
     ),
     modules=[
-        QuantumPrisonersDilemmaModel, 
+        QuantumOrderEffectModels, 
         # Base.get_extension(SequentialSamplingModels, :TuringExt),  
         # Base.get_extension(SequentialSamplingModels, :PlotsExt) 
     ],

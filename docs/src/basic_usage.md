@@ -11,8 +11,12 @@ The quantum prisoner's dilemma model (QPDM) generates predictions for three cond
 3. Player 1 is not informed of the action of player 2
 
 ```@example 
-using QuantumPrisonersDilemmaModel 
-model = QPDM(;μd=.51, γ=2.09)
+using QuantumOrderEffectModels
+Ψ = @. √([.35,.35,.15,.15])
+γₚ = 2
+γₙ = .5
+σ = .05
+model = QOEM(;Ψ, γₚ, γₙ, σ)
 predict(model)
 ```
 
@@ -20,18 +24,27 @@ predict(model)
 
 The code block below demonstrates how to generate simulated data from the model using `rand`. In the example, we will generate 100 simulated trials for each condition. 
 ```@example 
-using QuantumPrisonersDilemmaModel 
-model = QPDM(;μd=.51, γ=2.09)
-data = rand(model, 100)
+using QuantumOrderEffectModels
+Ψ = @. √([.35,.35,.15,.15])
+γₚ = 2
+γₙ = .5
+σ = .05
+n_trials = 100
+model = QOEM(;Ψ, γₚ, γₙ, σ)
+data = rand(model, n_trials)
 ```
 
 # Evaluate Log Likelihood
 
 The log likelihood of data can be evaluated using `logpdf`. In the code block below, we generate simulated data and evaluate the logpdf: 
 ```@example 
-using QuantumPrisonersDilemmaModel 
-model = QPDM(;μd=.51, γ=2.09)
+using QuantumOrderEffectModels
+Ψ = @. √([.35,.35,.15,.15])
+γₚ = 2
+γₙ = .5
+σ = .05
 n_trials = 100
+model = QOEM(;Ψ, γₚ, γₙ, σ)
 data = rand(model, n_trials)
-logpdf(model, n_trials, data)
+logpdf(model, data)
 ```

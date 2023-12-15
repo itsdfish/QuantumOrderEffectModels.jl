@@ -2,70 +2,20 @@
     This page is under construction.
 # Introduction 
 
-In this tutorial, we present a quantum cognition model of interference effect's in the prisoner's dilemma. The goal is to provide a conceptual understanding of the model and how it produces interference effects. Before introducing the model, we will briefly describe the Prisoner's dilemma and the interference effect.  
+The goal of this tutorial is to describe a quantum cognition model of order effects. The model is applicable to tasks in which the probability of complementary hypotheses are judged each time new evidence is presented. 
 
-# The Prisoner's Dilemma
+# Medical Diagnosis Task
 
-The prisoner's dilemma (PD) is a two person interdependent decision making task from game theory. In a typical version of the PD, two players decide simultanouesly (i.e., without knowing the decision of the other) to cooperate or defect. The payoff each player recieves depends on both his or her choice and the choice of the other player. A typical payoff matrix is presented in the table below where entries $(x_1,x_2)$ correspond to the payoff given to player 1 and player 2, respectively. Assuming rational, self-interested players, the Nash equalibrium occurs when both players defect. Even though cooperating would lead to a better collective outcome (20 vs. 10), each individual has the incentive to defect. For example, if player 2 cooperates, player 1 recieves a better payoff by defecting (25 vs. 20). Alternatively, if player 2 defects, player 1 also recieves a better payoff by defecting (10 vs. 5).  
+The medical diagnosis task requires a person to judge the probability a fictious person has a disease (d) after two pieces of evidence are presented sequentially. A person makes an initial assessment of the probability of the disease based on symptoms and then makes two additional assessments based on negative evidence $e_n$ for test $j$ and positive evidence ($e_p$) for test $i$. The order of the evidence is varied ($e_n$ vs. $e_p$).
 
-```@raw html 
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;}
-.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg .tg-0lax{text-align:left;vertical-align:top}
-</style>
-<table class="tg">
-<thead>
-  <tr>
-    <th class="tg-0lax" colspan="2" rowspan="2"></th>
-    <th class="tg-0lax" colspan="2">Player 2 (you)</th>
-  </tr>
-  <tr>
-    <th class="tg-0lax">Defect</th>
-    <th class="tg-0lax">Cooperate</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td class="tg-0lax" rowspan="2">Player 1</td>
-    <td class="tg-0lax">Defect</td>
-    <td class="tg-0lax">(10,10)</td>
-    <td class="tg-0lax">(25,5)</td>
-  </tr>
-  <tr>
-    <td class="tg-0lax">Cooperate</td>
-    <td class="tg-0lax">(5,25)</td>
-    <td class="tg-0lax">(20,20)</td>
-  </tr>
-</tbody>
-</table>
-```
+# Order Effect 
 
-# Interference Effect 
+An order effect occurs when the final probability judgment of disease depends on the order in which evidence is presented. An order effect can be stated formally as: 
 
-The interference effect occurs when decisions in the PD violate the law of total probability. Consider an experiment of the prisoner's dilemma with three conditions:
+$\Pr(D=d \mid E_i=e_p, E_j=e_n) \ne \Pr(D=d \mid E_j=e_n, E_i=e_p).$
 
-1. Player 2 is told that player 1 defected: $R_2=d$
-2. Player 2 is told that player 1 cooperated: $R_2=c$
-3. Player 2 is not informed of player's action
-
-The law of total probability requires:
-
-$\Pr(R_2=d) = \Pr(R_2=d \mid R_1=d) \Pr(R_1=d) + \Pr(R_2=d \mid R_1=c) \Pr(R_1=c),$
-
-where the left hand side corresponds to condition 3 and the terms on the right hand side correspond to conditions 1 and 2, respectively. When this inequality does not hold, an interference effect occurs. 
-
-An important property of the law of total probability is that it requires condition 3 to be a weighted average of conditions 1 and 2. This implies the following ordering of terms:
-
-$\min(\Pr(R_2=d \mid R_1=d), \Pr(R_2=d \mid R_1=c)) \leq \Pr(R_2=d) \leq \max(\Pr(R_2=d \mid R_2=1), \Pr(R_2=d \mid R_1=c)),$
-
-which is violated in human decision making, leading to an interference effect. 
-
-An interference effect is present in the data because the response probability in condition 3 is below the response probabilities in conditions 1 and 2. The predictions of the quantum model are shown in the last column.
-
+Order effects are challenging to explain for classical probability models because evidence is commutative. One workaround for classical probability is to augment the sample space with an additional event representing evidence order. However, augmenting the sample space comes at the cost of creating additional parameters which need to be specified and justified, or estimated from data.
+  
 # Quantum Model 
 quantum prisoner's dilemma model (QPDM)
 ## Bases

@@ -149,42 +149,18 @@ Generates simulated data for the following conditions:
 γₚ = 2
 γₙ = .5
 σ = .05
+n_trials = 100
 model = QOEM(;Ψ, γₚ, γₙ, σ)
-data = rand(model, 100)
+data = rand(model, n_trials)
 ```
 """
 function rand(model::AbstractQOEM, n::Int; t = 1, r = .05)
     μs = predict(model; t)
     σ = model.σ
     θ = to_beta.(μs, [σ])
-    f(Θ) = map(θ -> round_val(rand(Beta(θ...)), r), Θ)
+    #f(Θ) = map(θ -> round_val(rand(Beta(θ...)), r), Θ)
+    f(Θ) = map(θ -> rand(Beta(θ...)), Θ)
     return [f(θ) for _ ∈ 1:n]
-end
-
-"""
-    pdf(model::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1, r = .05)
-
-Returns the joint probability density given data for the following conditions:
-
-1. Pr(disease)
-2. Pr(disease | positive)
-3. Pr(disease | positive, negative)
-4. Pr(disease | negative)
-5. Pr(disease | negative, positive)  
-
-# Arguments
-
-- `model::AbstractQOEM`: a model object for a quantum order effect model 
-- `n`: the number of trials per condition 
-- `n_d`: the number of defections in each condition 
-
-# Keywords
-
-- `t = 1`: time of decision
-"""
-function pdf(model::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1, r = .05)
-    Θ = predict(model; t)
-    return prod(@. pdf(Binomial(n, Θ), n_d)) 
 end
 
 """
@@ -211,21 +187,92 @@ Returns the joint log density given data for the following conditions:
 # Example 
 
 ```julia 
-using QuantumOrderEffectModels 
-model = QPDM(;μd=.51, γ=2.09)
+Ψ = @. √([.35,.35,.15,.15])
+γₚ = 2
+γₙ = .5
+σ = .05
 n_trials = 100
+model = QOEM(;Ψ, γₚ, γₙ, σ)
 data = rand(model, n_trials)
-logpdf(model, n_trials, data)
+logpdf(model, data)
 ```
 """
-function logpdf(model::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1, r = .05)
+function pdf(model::AbstractQOEM, data::Vector{Vector{T}}; t = 1, r = .05) where {T<:Real}
     Θ = predict(model; t)
-    return sum(@. logpdf(Binomial(n, Θ), n_d))
+    L = 1.0
+    for d ∈ data 
+        L *= _pdf(model, Θ, d; r)
+    end
+    return L
 end
 
-loglikelihood(d::AbstractQOEM, data::Tuple) = logpdf(d, data...)
+function _pdf(model::AbstractQOEM, Θ, data; r = .05)
+    L = 1.0
+    σ = model.σ
+    for i ∈ 1:length(Θ) 
+        parms = to_beta(Θ[i], σ)
+        lb,ub = get_bounds(Θ[i], r)
+        L *= resp_prob(parms, lb, ub)
+    end
+    return L
+end
 
-logpdf(model::AbstractQOEM, x::Tuple) = logpdf(model, x...)
+"""
+    logpdf(model::AbstractQOEM, n::Int, n_d::Vector{Int}; t = 1, r = .05)
+
+Returns the joint log density given data for the following conditions:
+
+1. Pr(disease)
+2. Pr(disease | positive)
+3. Pr(disease | positive, negative)
+4. Pr(disease | negative)
+5. Pr(disease | negative, positive)  
+    
+# Arguments
+
+- `model::AbstractQOEM`: a model object for a quantum order effect model 
+- `n`: the number of trials per condition 
+- `n_d`: the number of defections in each condition 
+
+# Keywords
+
+- `t = 1: time of decision
+
+# Example 
+
+```julia 
+Ψ = @. √([.35,.35,.15,.15])
+γₚ = 2
+γₙ = .5
+σ = .05
+n_trials = 100
+model = QOEM(;Ψ, γₚ, γₙ, σ)
+data = rand(model, n_trials)
+logpdf(model, data)
+```
+"""
+function logpdf(model::AbstractQOEM, data::Vector{Vector{T}}; t = 1, r = .05) where {T<:Real}
+    Θ = predict(model; t)
+    LL = 0.0
+    for d ∈ data 
+        LL += _logpdf(model, Θ, d; r)
+    end
+    return LL
+end
+
+function _logpdf(model::AbstractQOEM, Θ, data; r = .05)
+    LL = 0.0
+    σ = model.σ
+    for i ∈ 1:length(Θ) 
+        parms = to_beta(Θ[i], σ)
+        lb,ub = get_bounds(Θ[i], r)
+        #LL += log(resp_prob(parms, lb, ub))
+        LL += logpdf(Beta(parms...), data[i])
+    end
+    return LL
+end
+
+loglikelihood(d::AbstractQOEM, data::Vector{Vector{T}}) where {T<:Real} = logpdf(d, data)
 
 function round_val(p, r) 
     v = 1 / r 
@@ -235,5 +282,19 @@ end
 function to_beta(μ, σ)
     α = ((1 - μ) / σ^2 - (1 / μ)) * μ^2
     β = α * ((1 / μ) - 1)
+    α = max(α, eps())
+    β = max(β, eps())
     return α, β
+end
+
+get_bounds(x, r) = max(x - r / 2, 0.0), min(x + r / 2, 1.0)
+
+function resp_prob(parms, lb, ub) 
+    dist = Beta(parms...)
+    return cdf(dist, ub) - cdf(dist, lb)
+end
+
+function mylogpdf(α, β, x)
+    lb,ub = get_bounds(x, .05)
+    return log(resp_prob([α,β], lb, ub))
 end

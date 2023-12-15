@@ -1,6 +1,7 @@
 module QuantumOrderEffectModels
 
     using Distributions: Beta
+    using Distributions: cdf
     using Distributions: ContinuousUnivariateDistribution
     using LinearAlgebra
 
