@@ -11,26 +11,26 @@ A model object for a quantum model for medical diagnosis.
 A person's cognitive state Ψ is represented in a 4D belief space where basis vectors correspond to 
 hypotheses and evidence states: 
 
-1. disease present and positive evidence 
-2. disease present and negative evidence 
-3. disease absent and positive evidence 
-4. disease absent and negative evidence 
+1. disease present and positive evidence for disease
+2. disease present and negative evidence for disease
+3. disease absent and positive evidence for disease
+4. disease absent and negative evidence for disease
 
 # Fields 
 
 - `Ψ::V`: initial state vector (superposition)
-- `γₚ::T`: rotation for positive evidence 
-- `γₙ::T`: rotation for negative evidence
+- `γₕ::T`: rotation for positive evidence from medical history
+- `γₗ::T`: rotation for negative evidence from laboratory test
 - `σ::T`: the standard deviation of probability judgments
 
 # Example 
 
 ```julia
 Ψ = [√(.676 / 2),√(.676 / 2),√(.324 / 2),√(.324 / 2)]
-γₚ = 4.4045 / √(.5)
-γₙ = 0.3306 / √(.5)
+γₕ = 4.4045 / √(.5)
+γₗ = 0.3306 / √(.5)
 σ = .10
-model = QOEM(;Ψ, γₚ, γₙ, σ)
+model = QOEM(;Ψ, γₕ, γₗ, σ)
 predict(model)
 ```
 
@@ -40,15 +40,15 @@ Trueblood, J. S., & Busemeyer, J. R. (2011). A quantum probability account of or
 """
 struct QOEM{T<:Real,V<:AbstractVector{T}} <: AbstractQOEM
     Ψ::V
-    γₚ::T 
-    γₙ::T
+    γₕ::T 
+    γₗ::T
     σ::T
 end
 
-QOEM(;Ψ, γₚ, γₙ, σ) = QOEM(Ψ, γₚ, γₙ, σ)
+QOEM(;Ψ, γₕ, γₗ, σ) = QOEM(Ψ, γₕ, γₗ, σ)
 
-function QOEM(Ψ, γₚ, γₙ, σ)
-    _, γₚ, γₙ, σ = promote(Ψ[1], γₚ, γₙ, σ)
-    Ψ = convert(Vector{typeof(γₚ)}, Ψ)
-    return QOEM(Ψ, γₚ, γₙ, σ)
+function QOEM(Ψ, γₕ, γₗ, σ)
+    _, γₕ, γₗ, σ = promote(Ψ[1], γₕ, γₗ, σ)
+    Ψ = convert(Vector{typeof(γₕ)}, Ψ)
+    return QOEM(Ψ, γₕ, γₗ, σ)
 end

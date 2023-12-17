@@ -15,48 +15,52 @@ Returns predicted response probability for the following conditions:
 
 The output is a vector of predictions corresponding to the following conditions:
 
+## Order 1
 1. Pr(disease)
-2. Pr(disease | positive)
-3. Pr(disease | positive, negative)
-4. Pr(disease | negative)
-5. Pr(disease | negative, positive)
+2. Pr(disease | lab test)
+3. Pr(disease | lab test, medical history)
+
+## Order 2
+4. Pr(disease)
+5. Pr(disease | medical history)
+6. Pr(disease | medical history, lab test)
 
 # Example 
 
 ```julia 
 using QuantumOrderEffectModels
 Ψ = @. √([.35,.35,.15,.15])
-γₚ = 2
-γₙ = .5
+γₕ = 2
+γₗ = .5
 σ = .05
-model = QOEM(;Ψ, γₚ, γₙ, σ)
+model = QOEM(;Ψ, γₕ, γₗ, σ)
 predict(model)
 ```
 """
 function predict(model::AbstractQOEM; t = 1.0)
-    (;Ψ, γₚ, γₙ) = model
+    (;Ψ, γₕ, γₗ) = model
 
     H1 = make_H1(model)
     H2 = make_H2(model)
     H = √(1/2) .* (H1 .+ H2)
 
-    # unitary transformation matrix for positive evidence
-    Upi = exp(-im * t * γₚ * H)
-    # unitary transformation matrix for positive evidence
-    Uni = exp(-im * t * γₙ * H)
+    # unitary transformation matrix for positive evidence from medical history
+    Upi = exp(-im * t * γₕ * H)
+    # unitary transformation matrix for negative evidence from laboratory test
+    Uni = exp(-im * t * γₗ * H)
     
     #  projector for positive evidence
     Pp = Diagonal([1,0,1,0])
-    # projector for positive evidence and disease present
+    # projector for disease present
     Pd = Diagonal([1,1,0,0])
-    #  projector for negative evidence
+    # projector for negative evidence
     Pn = Diagonal([0,1,0,1])
     
     # probability of disease before observing additional evidence
     proj_d = Pd * Ψ
     prob_d = proj_d' * proj_d
     
-    # state projected onto observed positive evidence
+    # state projected onto observed positive evidence from medical history
     Ψp = Pp * Upi * Ψ
     # update/normalize the state
     Ψp = Ψp ./ norm(Ψp)
@@ -65,7 +69,7 @@ function predict(model::AbstractQOEM; t = 1.0)
     # probability of disease given positive evidence 
     prob_dgp = real(proj_d'* proj_d)
     
-    # project onto negative evidence basis
+    # project onto negative evidence basis for laboratory test
     Ψpn = Pn * Uni * Upi'* Ψp
     # update/normalize the state
     Ψpn = Ψpn ./ norm(Ψpn)
@@ -74,7 +78,7 @@ function predict(model::AbstractQOEM; t = 1.0)
     # probability of disease given positive evidence then negative evidence
     prob_dgpn = real(proj_d' * proj_d)
     
-    # state projected onto observed negative evidence
+    # state projected onto observed negative evidence for laboratory test
     Ψn = Pn * Uni * Ψ
     # update/normalize the state
     Ψn = Ψn ./ norm(Ψn)
@@ -92,7 +96,7 @@ function predict(model::AbstractQOEM; t = 1.0)
     # probability of disease given negative and then positive evidence 
     prob_dgnp = real(proj_d' * proj_d)
     
-    return [prob_d, prob_dgp, prob_dgpn, prob_dgn, prob_dgnp]    
+    return [prob_d, prob_dgp, prob_dgpn, prob_d, prob_dgn, prob_dgnp]    
 end
 
 """
@@ -127,11 +131,15 @@ rand(model::AbstractQOEM; t = 1, r = .05) = rand(model, 1; t, r)
 
 Generates simulated data for the following conditions:
 
+## Order 1
 1. Pr(disease)
-2. Pr(disease | positive)
-3. Pr(disease | positive, negative)
-4. Pr(disease | negative)
-5. Pr(disease | negative, positive)
+2. Pr(disease | lab test)
+3. Pr(disease | lab test, medical history)
+
+## Order 2
+4. Pr(disease)
+5. Pr(disease | medical history)
+6. Pr(disease | medical history, lab test)
 
 # Arguments
 
@@ -145,12 +153,13 @@ Generates simulated data for the following conditions:
 # Example 
 
 ```julia 
+using QuantumOrderEffectModels
 Ψ = @. √([.35,.35,.15,.15])
-γₚ = 2
-γₙ = .5
+γₕ = 2
+γₗ = .5
 σ = .05
 n_trials = 100
-model = QOEM(;Ψ, γₚ, γₙ, σ)
+model = QOEM(;Ψ, γₕ, γₗ, σ)
 data = rand(model, n_trials)
 ```
 """
@@ -168,11 +177,15 @@ end
 
 Returns the joint log density given data for the following conditions:
 
+## Order 1
 1. Pr(disease)
-2. Pr(disease | positive)
-3. Pr(disease | positive, negative)
-4. Pr(disease | negative)
-5. Pr(disease | negative, positive)  
+2. Pr(disease | lab test)
+3. Pr(disease | lab test, medical history)
+
+## Order 2
+4. Pr(disease)
+5. Pr(disease | medical history)
+6. Pr(disease | medical history, lab test)
     
 # Arguments
 
@@ -187,12 +200,13 @@ Returns the joint log density given data for the following conditions:
 # Example 
 
 ```julia 
+using QuantumOrderEffectModels
 Ψ = @. √([.35,.35,.15,.15])
-γₚ = 2
-γₙ = .5
+γₕ = 2
+γₗ = .5
 σ = .05
 n_trials = 100
-model = QOEM(;Ψ, γₚ, γₙ, σ)
+model = QOEM(;Ψ, γₕ, γₗ, σ)
 data = rand(model, n_trials)
 logpdf(model, data)
 ```
@@ -222,11 +236,15 @@ end
 
 Returns the joint log density given data for the following conditions:
 
+## Order 1
 1. Pr(disease)
-2. Pr(disease | positive)
-3. Pr(disease | positive, negative)
-4. Pr(disease | negative)
-5. Pr(disease | negative, positive)  
+2. Pr(disease | lab test)
+3. Pr(disease | lab test, medical history)
+
+## Order 2
+4. Pr(disease)
+5. Pr(disease | medical history)
+6. Pr(disease | medical history, lab test)
     
 # Arguments
 
@@ -242,11 +260,11 @@ Returns the joint log density given data for the following conditions:
 
 ```julia 
 Ψ = @. √([.35,.35,.15,.15])
-γₚ = 2
-γₙ = .5
+γₕ = 2
+γₗ = .5
 σ = .05
 n_trials = 100
-model = QOEM(;Ψ, γₚ, γₙ, σ)
+model = QOEM(;Ψ, γₕ, γₗ, σ)
 data = rand(model, n_trials)
 logpdf(model, data)
 ```

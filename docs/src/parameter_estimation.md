@@ -20,8 +20,8 @@ The next step is to generate some simulated data from which the parameters can b
 ```julia
 Random.seed!(16)
 Ψ = @. √([.35,.35,.15,.15])
-parms = (Ψ, γₚ = 2.0, γₙ = .5, σ = .05)
-n_trials = 100
+parms = (Ψ, γₕ = 2.0, γₗ = 1.0, σ = .05)
+n_trials = 50
 model = QOEM(;parms...)
 data = rand(model, n_trials)
 ```
@@ -32,10 +32,10 @@ The next step is to define a Turing model with the `@model` macro. We will estim
 
 ```julia 
 @model function turing_model(data, parms)
-    γₚ ~ Normal(0, 3)
-    γₙ ~ Normal(0, 3)
+    γₕ ~ Normal(0, 3)
+    γₗ ~ Normal(0, 3)
     σ ~ LogNormal(-1, 1)
-    data ~ QOEM(;parms..., γₚ, γₙ, σ)
+    data ~ QOEM(;parms..., γₕ, γₗ, σ)
 end
 ```
 
@@ -47,23 +47,25 @@ pt = pigeons(
     target=TuringLogPotential(turing_model(data, parms)), 
     record=[traces],
     multithreaded=true)
-samples = Chains(sample_array(pt), ["γₚ", "γₙ","σ"])
+samples = Chains(sample_array(pt), ["γₕ", "γₗ","σ"])
+plot(samples)
 ```
 The trace of the `pigeon`'s sampler is given below:
 ```julia
 ────────────────────────────────────────────────────────────────────────────
   scans        Λ      log(Z₁/Z₀)   min(α)     mean(α)    min(αₑ)   mean(αₑ) 
 ────────── ────────── ────────── ────────── ────────── ────────── ──────────
-        2       3.92       -198          0      0.565      0.857      0.944 
-        4       2.73        325   2.52e-08      0.696      0.973      0.997 
-        8          4        363     0.0821      0.556          1          1 
-       16       4.67        378    0.00235      0.481      0.993      0.999 
-       32       4.61        385      0.131      0.488      0.997      0.999 
-       64       5.21        386      0.277      0.422      0.998          1 
-      128       5.11        386      0.334      0.433      0.999          1 
-      256       5.09        386      0.337      0.435      0.997          1 
-      512       5.11        386      0.365      0.432      0.998          1 
- 1.02e+03       5.04        386      0.398       0.44      0.999          1 
+        2        4.9       -150          0      0.456      0.857      0.961 
+        4       2.47        402   1.61e-23      0.726      0.973      0.997 
+        8       5.03        444   0.000401      0.441          1          1 
+       16       5.27        459      0.136      0.415      0.993      0.999 
+       32       6.11        461     0.0646      0.321          1          1 
+       64       5.51        466      0.232      0.388          1          1 
+      128       5.13        470      0.257       0.43      0.997          1 
+      256       5.18        469      0.311      0.425      0.998          1 
+      512       5.14        469      0.347      0.429      0.999          1 
+ 1.02e+03       5.14        469      0.398      0.429      0.998          1 
+────────────────────────────────────────────────────────────────────────────
 ```
 
 ## Plot Posterior Distribution 

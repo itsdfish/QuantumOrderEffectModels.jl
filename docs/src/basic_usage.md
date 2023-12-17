@@ -4,19 +4,25 @@ This page provides an overview of the API along with examples.
 
 # Make Predictions
 
-The quantum prisoner's dilemma model (QPDM) generates predictions for three conditions:
+The quantum order effect model (QOEM) generates predictions for six conditions:
 
-1. Player 1 is told that player 2 defected
-2. Player 1 is told that player 2 cooperated
-3. Player 1 is not informed of the action of player 2
+## Order 1
+1. Pr(disease)
+2. Pr(disease | lab test)
+3. Pr(disease | lab test, medical history)
+
+## Order 2
+4. Pr(disease)
+5. Pr(disease | medical history)
+6. Pr(disease | medical history, lab test)
 
 ```@example 
 using QuantumOrderEffectModels
 Ψ = @. √([.35,.35,.15,.15])
-γₚ = 2
-γₙ = .5
+γₕ = 2
+γₗ = .5
 σ = .05
-model = QOEM(;Ψ, γₚ, γₙ, σ)
+model = QOEM(;Ψ, γₕ, γₗ, σ)
 predict(model)
 ```
 
@@ -26,11 +32,11 @@ The code block below demonstrates how to generate simulated data from the model 
 ```@example 
 using QuantumOrderEffectModels
 Ψ = @. √([.35,.35,.15,.15])
-γₚ = 2
-γₙ = .5
+γₕ = 2
+γₗ = .5
 σ = .05
 n_trials = 100
-model = QOEM(;Ψ, γₚ, γₙ, σ)
+model = QOEM(;Ψ, γₕ, γₗ, σ)
 data = rand(model, n_trials)
 ```
 
@@ -40,11 +46,11 @@ The log likelihood of data can be evaluated using `logpdf`. In the code block be
 ```@example 
 using QuantumOrderEffectModels
 Ψ = @. √([.35,.35,.15,.15])
-γₚ = 2
-γₙ = .5
+γₕ = 2
+γₗ = .5
 σ = .05
 n_trials = 100
-model = QOEM(;Ψ, γₚ, γₙ, σ)
+model = QOEM(;Ψ, γₕ, γₗ, σ)
 data = rand(model, n_trials)
 logpdf(model, data)
 ```

@@ -2,31 +2,51 @@
     This page is under construction.
 # Introduction 
 
-The goal of this tutorial is to describe a quantum cognition model of order effects. The model is applicable to tasks in which the probability of complementary hypotheses are judged each time new evidence is presented. 
+Prior research has found that the judged likelihood of a hypothesis often depends on the order in which evidence is presented. In other words, the final judgment that a hypothesis is true is different for evidence sequence $e_i, e_j$ and evidence sequence $e_j, e_i$. The goal of this tutorial is to describe a quantum order effect model (QOEM) as it applies to a medical diagnosis task. The basic model can be adapted to other tasks in which evidence is evaluated sequentially.  
 
 # Medical Diagnosis Task
 
-The medical diagnosis task requires a person to judge the probability a fictious person has a disease (d) after two pieces of evidence are presented sequentially. A person makes an initial assessment of the probability of the disease based on symptoms and then makes two additional assessments based on negative evidence $e_n$ for test $j$ and positive evidence ($e_p$) for test $i$. The order of the evidence is varied ($e_n$ vs. $e_p$).
+Medical doctors routinely perform medical diagnosis as part of their job requirements. Medical diagnosis is the process of assessing the probability a patient has a disease based on symptoms and medical tests. Below, we use the QOEM to understand a how a person evaluates the hypothesis that a fictitous patient has a disease (d) after evidence from two informatino sources are presented sequentially. The judgments are made in two conditions, which vary the presentation order of the evidence. In one condition, a person makes the following judgments:
+
+1. the probability of disease based on initial symptoms 
+2. update the probability of disease after the medical history $S_i$ provides positive evidence for the disease
+3. update the probability of disease after the laboratory test $S_j$ provides negative evidence for the disease
+
+The procedure for the other condition is identical except the order of the information sources $S_i,S_j$ is reversed: 
+
+1. the probability of disease based on initial symptoms 
+2. update the probability of disease after the laboratory test $S_j$ provides negative evidence for the disease
+3. update the probability of disease after the medical history $S_i$ provides positive evidence for the disease
 
 # Order Effect 
 
 An order effect occurs when the final probability judgment of disease depends on the order in which evidence is presented. An order effect can be stated formally as: 
 
-$\Pr(D=d \mid E_i=e_p, E_j=e_n) \ne \Pr(D=d \mid E_j=e_n, E_i=e_p).$
+$\Pr(D=d \mid S_i=1, S_j=-1) \ne \Pr(D=d \mid S_j=-1, S_i=1).,$
 
-Order effects are challenging to explain for classical probability models because evidence is commutative. One workaround for classical probability is to augment the sample space with an additional event representing evidence order. However, augmenting the sample space comes at the cost of creating additional parameters which need to be specified and justified, or estimated from data.
-  
-# Quantum Model 
-quantum prisoner's dilemma model (QPDM)
-## Bases
+where $1$ indicates positive evidence and $-1$ indicates negative evidence for the disease. Order effects are challenging to explain for classical probability models because evidence is commutative. One workaround for classical probability is to augment the sample space with an additional event representing evidence order. However, augmenting the sample space comes at the cost of creating additional parameters which need to be specified and justified, or estimated from limited data.
 
-The QPDM consists of four basis states respesenting the four possible outcomes for defect (D) and cooperate (C):
+# Quantum Order Effect Model 
+
+According to the QOEM, positive and negative evidence form *incompatible* events, meaning they cannot be considered simultaneously. As a consequence, a person cannot represent the full joint distribution of events over disease status (present vs. absent), evidence type (positive vs. negative), and information source (medical history vs. laboratory test). Instead, incompatible events are represented in a lower dimensional space by different bases, which must be evaluated sequentially. Bases correspond to different perspectives of a situation. In the medical diagnosis task, the QOEM assumes that positive and negative evidence are viewed one at a time from different perspectives. Order effects arise from this process because the linear algebra operations described below are non-commutative. 
+
+## Basis
+
+The first in defining a quantum model is to determine which events are compatible and which are incompatible. The QOEM assumes information source is incompatible, but disease status and evidence type are compatible. Consequentially, the basis of the QOEM consists of four states corresponding to the all possible combinations of disease status and evidence type:
+
+1. disease present (p) and positive evidence for disease (p)
+2. disease present (p) and negative evidence for disease (n)
+3. disease absent (a) and positive evidence for disease (p)
+4. disease absent (a) and negative evidence for disease (n)
+
+where the values in the parentheses correspond to indices. In the notation used below, the first index corresponds to the presence or absence of the disease, and the second index corresponds to the type of evidence for the disease (positive or negative). Information source is represented as different bases within the reduced 4 dimensional space. Each basis for information source is related to the other bases through a rotation factor, which corresponds to the idea of viewing the diagnosis from different perspectives. More formally, the basis is given by the following orthonormal vectors in the standard position:  
+
 ```math
-\mathbf{B} = \{\ket{\textrm{DD}},\ket{\textrm{DC}},\ket{\textrm{CD}},\ket{\textrm{CC}}\}
+\mathbf{B} = \{\ket{\textrm{B}_{p,p}},\ket{\textrm{B}_{p,n}},\ket{\textrm{B}_{a,p}},\ket{\textrm{B}_{a,n}}\},
 ```
-where basis $\ket{ij}$ repesents the outcome in which the opponent chooses $i$ and you choose $j$. We will assume $\mathbf{B}$ is the standard basis, meaning each basis vector consists of a 1 with all other elements equal to zero, e.g., 
+where each basis vector consists of a 1 with all other elements equal to zero, e.g., 
 
-$\ket{\textrm{DD}} = \begin{bmatrix}
+$\ket{\textrm{B}_{p,p}} = \begin{bmatrix}
 	1 \\ 
 	0 \\ 
 	0 \\ 
@@ -47,41 +67,55 @@ Combining the basis vectors into a single matrix, we get the identity matrix:
 
 The state of the cognitive system is a superposition (i.e. linear combination) over basis states:
 
-$\ket{\boldsymbol{\psi}} = \alpha_{\textrm{DD}} \ket{\textrm{DD}}+ \alpha_{\textrm{DC}} \ket{\textrm{DC}}+ \alpha_{\textrm{CD}} \ket{\textrm{CD}}+ \alpha_{\textrm{CC}} \ket{\textrm{CC}},$
+$\ket{\boldsymbol{\psi}} = \alpha_{p,p} \ket{B_{p,p}} + \alpha_{p,n} \ket{\textrm{B}_{p,n}}+ \alpha_{a,p}\ket{\textrm{B}_{a,p}}+ \alpha_{a,n} \ket{\textrm{B}_{a,n}},$
 
 where $\lVert\ket{\boldsymbol{\psi}} \rVert = 1$. The coefficients can be written as:
 
 $\boldsymbol{\alpha} = \begin{bmatrix}
-	\alpha_{\textrm{DD}} \\ 
-	\alpha_{\textrm{DC}} \\ 
-	\alpha_{\textrm{CD}} \\ 
-	\alpha_{\textrm{CC}} \\ 
-\end{bmatrix}$
-
-The QPDM assumes the initial state of the decision maker is a uniform superposition over basis states: 
-
-$\ket{\boldsymbol{\psi}_0} = \frac{1}{2}\begin{bmatrix}
-	1 \\ 
-	1 \\ 
-	1 \\ 
-	1 \\ 
-\end{bmatrix},$
-In conditions 1 and 2, the state is updated upon learning the decision of player 1: $\ket{\boldsymbol{\psi}_0} \rightarrow \ket{\boldsymbol{\psi}_k},k \in \{c,d\}$. When player 2 is told that player 1 defected, the state vector becomes:
-
-$\ket{\boldsymbol{\psi}_d} = \frac{1}{\sqrt{2}}\begin{bmatrix}
-	1 \\ 
-	1 \\ 
-	0 \\ 
-	0 \\ 
-\end{bmatrix},$
-indicating that the state collapsed onto the sub-space representing player 1 defected. Similarly, when player 2 is told that player 1 cooperated, the state collapses to the sub-space represnting the event player 1 cooperated, giving: 
-
-$\ket{\boldsymbol{\psi}_c} = \frac{1}{\sqrt{2}}\begin{bmatrix}
-	0 \\ 
-	0 \\ 
-	1 \\ 
-	1 \\ 
+	\alpha_{p,p} \\ 
+	\alpha_{p,n} \\ 
+	\alpha_{a,p} \\ 
+	\alpha_{a,n} \\ 
 \end{bmatrix}.$
+
+The initial state is is based on the mean probability judgment after the first symptoms are described: 
+
+$\ket{\boldsymbol{\psi}} = \begin{bmatrix}
+	\sqrt(\frac{.676}{2}) \\ 
+	\sqrt(\frac{.676}{2}) \\ 
+	\sqrt(\frac{.324}{2}) \\ 
+	\sqrt(\frac{.324}{2}) \\ 
+\end{bmatrix}.$
+
+## Projectors 
+
+The QOEM makes repeated use of three projection matrices. The following projector is used to evaluate the probability of disease:
+
+$\mathbf{P}_d = \ket{\textrm{B}_{p,p}} \bra{\textrm{B}_{p,p}} + \ket{\textrm{B}_{p,n}} \bra{\textrm{B}_{p,n}} = \begin{bmatrix}		
+	1 & 0 & 0 & 0\\
+	0 & 1 & 0 & 0\\
+	0 & 0 & 0 & 0\\
+	0 & 0 & 0 & 0\\
+\end{bmatrix}.$
+
+Notice it spans the 2D sub-space in which the disease is present. The next projector is used to evaluate the probability of positive evidence:
+
+$\mathbf{P}_p = \ket{\textrm{B}_{p,p}} \bra{\textrm{B}_{p,p}} + \ket{\textrm{B}_{a,p}} \bra{\textrm{B}_{a,p}} = \begin{bmatrix}		
+	1 & 0 & 0 & 0\\
+	0 & 0 & 0 & 0\\
+	0 & 0 & 1 & 0\\
+	0 & 0 & 0 & 0\\
+\end{bmatrix}.$
+
+Similarly, the projector spans the 2D sub-space in which positive evidence is discovered. Finally, the following projector evaluates the probability of negative evidence:
+
+$\mathbf{P}_n = \ket{\textrm{B}_{p,n}} \bra{\textrm{B}_{p,n}} + \ket{\textrm{B}_{a,n}} \bra{\textrm{B}_{a,n}} = \begin{bmatrix}		
+	0 & 0 & 0 & 0\\
+	0 & 1 & 0 & 0\\
+	0 & 0 & 0 & 0\\
+	0 & 0 & 0 & 1\\
+\end{bmatrix}.$
+As before, the projector spans the 2D sub-space in which negative evidence is discovered. 
 
 ## Hamiltonian Matrices
 
@@ -98,54 +132,47 @@ $\mathbf{H}_{A_k} = \frac{1}{\sqrt{1 + \mu_k^2}}\begin{bmatrix}
 	1 & -\mu_k\\
 \end{bmatrix}.$
 
-```@raw html
-<details>
-<summary><b>Show Code</b></summary>
-```
-```@example h1_defect
-using Plots 
-prob_defect(μ, t) = .5 + (μ / (1 + μ^2)) * sin((π * t) / 2)^2
-μs = range(-1, 1, length=5)
-ts = range(0, π / 2, length=100)
-plot_Ha = plot(ts, map(μ -> prob_defect.(μ, ts), μs), grid=false, label=μs', 
-	xlabel="Time", ylabel="Probability Defect", legendtitle="μ")
-savefig("h1_prob.png")
-```
-```@raw html
-</details>
-```
-![](h1_prob.png)
 
-## Action Selection 
+## Evidence Evaluation
 
 This selection describes the process of selecting an action and determining the defection probability. The time evolution is governed by the unitary transformation matrix which is given by:
 
-$\mathbf{U} = e^{-i \cdot t \cdot  \mathbf{H}},$
+$\mathbf{U}_h= e^{-i \cdot t \cdot  \mathbf{H}_p},$
 
-The QPDM makes the simplifying assumption that the decision is made after a relative short period of time where the wave function is at the maximum amplitude: $t=\frac{\pi}{2}$. Next, we define a projection matrix for computing the probability of defecting. The probability of defecting is the sum of outer products for DD and DC:  
+$\mathbf{U}_l = e^{-i \cdot t \cdot  \mathbf{H}_n},$
 
-$\mathbf{P} = \ket{\textrm{DD}} \bra{\textrm{DD}} + \ket{\textrm{DC}} \bra{\textrm{DC}} = \begin{bmatrix}		
-	1 & 0 & 0 & 0\\
-	0 & 0 & 0 & 0\\
-	0 & 0 & 1 & 0\\
-	0 & 0 & 0 & 0\\
-\end{bmatrix}$
 
-The probability of player 2 defecting is given by the squared magnitude of the projection from the current state $\boldsymbol{\psi}_1 \rightarrow \boldsymbol{\psi}_2$. The probability that player 2 defects given that player 1 defected is:
+## QOEM Predictions
 
-$\Pr(R_2=d \mid R_1=d) = \lVert\mathbf{P} \cdot \mathbf{U} \cdot  \ket{\psi_d}\rVert^2$
+First, we will compute the probability the disease is present before evidence from the tests is presented. The probability is the same for both orders. The computation involves projecting the intial state onto the sub-space spanning disease present and squaring the magnitude of the projection, which is computed as:
 
-The probability that player 2 defects given that player 1 cooperated is:
+$\Pr(D=d) = \lVert \mathbf{P}_d \ket{\psi} \rVert^2.$
 
-$\Pr(R_2=d \mid R_1=c) = \lVert\mathbf{P} \cdot  \mathbf{U} \cdot  \ket{\psi_c}\rVert^2$
+Next, suppose we update the assessment of the disease given positive evidence from test $i$ is found. The process involves three computations: (1) projecting the initial state onto the positive evidence sub-space, (2) normalizing the state vector, and (3) projecting the new state onto the sub-space spanning disease present. To update the state, we first project onto the sub-space representing positive evidence.
 
-The probability that player 2 defects given that the action of player 1 is unknown is:
+$\ket{\psi_p^\prime} = \mathbf{P}_p \mathbf{U}_h\ket{\psi}.$ 
 
-$\Pr(R_2=d) = \lVert\mathbf{P} \cdot  \mathbf{U} \cdot  \ket{\psi_0}\rVert^2$
+Note that he unitary matrix $\mathbf{U}_p$ changes the system to the basis for positive evidence. After projecting on to the sub-space for positive evidence, the state collapses to the positive evidence sub-space because the evidence from the first test is \emph{known}$ to be positive. As a result, the new state must be normalized such that the squared magnitude is 1:
 
-## QPDM Predictions
+$\ket{\psi_p} = \frac{\ket{\psi_p^\prime}}{\lVert \ket{\psi_p^\prime} \rVert}.$ 
 
-As a simple example, the code block illustrates how to generate the predictions in the table above. The first parameter $\mu_d$ is the utility for defecting. When no value is passed for the utility of cooperating, $\mu_d = \mu_c$. The parameter $\gamma$ is the entanglement parameter which aligns beliefs about the opponents action and one's own action. The model predictions are given below, along with the emprical data:
+The last step involves projecting onto the sub-space spanning disease present and squaring the magnitude to obtain the revised probability judgment for the disease:
+
+$\Pr(D=d \mid E_i = 1) = \lVert \mathbf{P}_d \ket{\psi_p} \rVert^2.$
+
+Next, negative evidence is presented from the second test. A similar sequence of steps is followed. The first step involves projecting onto the sub-space spanned by negative evidence: 
+
+$\ket{\psi_{pn}^\prime} = \mathbf{P}_n \mathbf{U}_l \mathbf{U}_p^\dagger \ket{\psi_p}.$ 
+
+Notice that the process of changing bases involves an extra step. Because the model is currently in the positive evidence basis, it is necessary to perform the inverse operation with the conjugate transpose $\mathbf{U}_p^\dagger$ and then switch to the basis for negative evidence with $\mathbf{U}_l$. As before, the state collapses to negative evidence because negative evidence was observed. Thus, the state must be normalized:
+
+$\ket{\psi_{pn}} = \frac{\ket{\psi_{pn}^\prime}}{\lVert \ket{\psi_{pn}^\prime} \rVert}.$ 
+
+Now that the state is in the sub-space for negative evidence, the last step involves projecting onto the 
+disease present sub-space to obtain a probability judgment for the presense of the disease:
+
+$\Pr(D=d \mid E_i = 1, E_j=-1) = \lVert \mathbf{P}_d \ket{\psi_{pn}} \rVert^2.$
+
 
 
 |  Condition   | Formula    | Data | Model |
@@ -156,83 +183,14 @@ As a simple example, the code block illustrates how to generate the predictions 
 
 The code used to generate the predictions can be viewed by expanding the code block below:
 
-```@raw html
-<details>
-<summary><b>Show Code</b></summary>
-```
-```@example model_preds
-using QuantumPrisonersDilemmaModel
-model = QPDM(;μd=.51, γ=2.09)
-preds = predict(model)
-```
-```@raw html
-</details>
-```
 ### Dynamics 
 
 The plot below shows the dynamics of the model for each condition.
-
-```@raw html
-<details>
-<summary><b>Show Code</b></summary>
-```
-```@example a
-using Plots
-using QuantumPrisonersDilemmaModel 
-model = QPDM(;μd=.51, γ=2.09)
-ts = range(0, 3, length=300)
-preds = map(t -> predict(model; t), ts)
-color = [RGB(.251,.388,.847) RGB(.584,.345,.689) RGB(.796,.235,.2)]
-p1 = plot(ts, reduce(vcat, transpose.(preds)), grid=false, 
-    label=["p1 Defects" "p1 Cooperates" "p1 Unknown"], 
-    xlabel="Time", ylabel="Prob p2 Defects", linewidth=2; color)
-savefig("probs_time.png")
-```
-```@raw html
-</details>
-```
-![](probs_time.png)
 
 ### Interference Effects
 
 The plot below shows the interference effect as a function of $\mu$ for multiple values of $\gamma$. In the simulations below, we fix $t=\frac{\pi}{2}$.
 
-```@raw html
-<details>
-<summary><b>Show Code</b></summary>
-```
-```@example contour_plot
-using Plots 
-using QuantumPrisonersDilemmaModel 
-
-function compute_IE(;μ, γ) 
-	preds = predict(QPDM(;μd=μ, γ)) 
-	if preds[3] < minimum(preds[1:2])
-		return preds[3] - minimum(preds[1:2])
-	elseif preds[3] > maximum(preds[1:2]) 
-		return preds[3] - maximum(preds[1:2])
-	end
-	return 0.0
-end
-
-map_mu(;μs, γ) = map(μ -> compute_IE(;μ, γ), μs)
-
-compute_IE(;μ=.5, γ=2) 
-μs = range(-1, 1, length=200)
-γs = range(-2, 2, length=5)
-
-IEs = map(γ -> map_mu(;μs, γ), γs)
-
-ie_plot = plot(μs, IEs, grid=false, label=γs', 
-	xlabel="μ", ylabel="Interference Effect", legendtitle="γ", legend=:outerright)
-savefig("ie_plot.png")
-```
-```@raw html
-</details>
-```
-![](ie_plot.png)
-
-
 # References
 
-Pothos, E. M., & Busemeyer, J. R. (2009). A quantum probability explanation for violations of ‘rational’decision theory. Proceedings of the Royal Society B: Biological Sciences, 276(1665), 2171-2178.
+Trueblood, J. S., & Busemeyer, J. R. (2011). A quantum probability account of order effects in inference. Cognitive science, 35(8), 1518-1552.
