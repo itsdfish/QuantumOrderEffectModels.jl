@@ -28,5 +28,5 @@ makedocs(
 )
 
 deploydocs(
-    repo="github.com/itsdfish/QuantumPrisonersDilemmaModel.jl.git",
+    repo="github.com/itsdfish/QuantumOrderEffectModels.jl.git",
 )
