@@ -10,7 +10,7 @@ using SafeTestsets
     σ = .10
     dist = QOEM(;Ψ, γₕ, γₗ, σ)
     preds = predict(dist)
-    true_preds = [ 0.676, 0.793, 0.504,  0.676, 0.437, 0.59]
+    true_preds = [0.676, 0.793, 0.504, 0.676, 0.437, 0.59]
 
     @test preds ≈ true_preds atol = 1e-3
 end
@@ -109,10 +109,10 @@ end
     γₕs = range(Θ.γₕ * .80, Θ.γₕ * 1.20, length = 100)
     LLs = map(γₕ -> logpdf(QOEM(;Θ..., γₕ), data; r), γₕs)
     _,max_idx = findmax(LLs)
-    @test_skip γₕs[max_idx] ≈ Θ.γₕ rtol = .01
+    @test γₕs[max_idx] ≈ Θ.γₕ rtol = .01
 
     γₗs = range(Θ.γₗ * .80, Θ.γₗ * 1.20, length = 100)
     LLs = map(γₗ -> logpdf(QOEM(;Θ..., γₗ), data), γₗs)
     _,max_idx = findmax(LLs)
-    @test_skip γₗs[max_idx] ≈ Θ.γₗ rtol = .01
+    @test γₗs[max_idx] ≈ Θ.γₗ rtol = .01
 end

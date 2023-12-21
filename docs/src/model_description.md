@@ -2,7 +2,7 @@
     This page is under construction.
 # Introduction 
 
-Prior research has found that the judged likelihood of a hypothesis often depends on the order in which evidence is presented. In other words, the final judgment that a hypothesis is true is different for evidence sequence $e_i, e_j$ and evidence sequence $e_j, e_i$. The goal of this tutorial is to describe a quantum order effect model (QOEM) as it applies to a medical diagnosis task. The basic model can be adapted to other tasks in which evidence is evaluated sequentially.  
+Prior research has found that the judged likelihood of a hypothesis often depends on the order in which evidence is presented. In other words, the final judgment that a hypothesis is true is different for evidence sequence $S_i, S_j$ and evidence sequence $S_j, S_i$. The goal of this tutorial is to describe a quantum order effect model (QOEM) as it applies to a medical diagnosis task. The basic model can be adapted to other tasks in which evidence is evaluated sequentially.  
 
 # Medical Diagnosis Task
 
@@ -20,19 +20,19 @@ The procedure for the other condition is identical except the order of the infor
 
 # Order Effect 
 
-An order effect occurs when the final probability judgment of disease depends on the order in which evidence is presented. An order effect can be stated formally as: 
+An order effect occurs when the final probability judgment of disease depends on the order in which evidence is presented. An order effect for two sources of evidence can be stated formally as: 
 
-$\Pr(D=d \mid S_i=1, S_j=-1) \ne \Pr(D=d \mid S_j=-1, S_i=1).,$
+$\Pr(D=d \mid S_i=s_i, S_j=s_j) \ne \Pr(D=d \mid S_j=s_j, S_i=s_i),$
 
-where $1$ indicates positive evidence and $-1$ indicates negative evidence for the disease. Order effects are challenging to explain for classical probability models because evidence is commutative. One workaround for classical probability is to augment the sample space with an additional event representing evidence order. However, augmenting the sample space comes at the cost of creating additional parameters which need to be specified and justified, or estimated from limited data.
+where $s_i,s_j \in \{1,-1\}$ and 1 denotes positive evidence for the disease and -1 denotes negative evidence for the disease. Order effects are challenging to explain with classical probability models because evidence is assumed to be commutative (i.e., invariant to order). One workaround for classical probability is to augment the sample space with an additional event representing evidence order. However, augmenting the sample space comes at the cost of creating additional parameters which need to be specified and justified, or estimated from limited data.
 
 # Quantum Order Effect Model 
 
-According to the QOEM, positive and negative evidence form *incompatible* events, meaning they cannot be considered simultaneously. As a consequence, a person cannot represent the full joint distribution of events over disease status (present vs. absent), evidence type (positive vs. negative), and information source (medical history vs. laboratory test). Instead, incompatible events are represented in a lower dimensional space by different bases, which must be evaluated sequentially. Bases correspond to different perspectives of a situation. In the medical diagnosis task, the QOEM assumes that positive and negative evidence are viewed one at a time from different perspectives. Order effects arise from this process because the linear algebra operations described below are non-commutative. 
+According to the QOEM, evidence sources constitute *incompatible* events, meaning they cannot be considered simultaneously because the joint probability distribution is not defined. In particular, a person cannot represent the 8 dimensional joint distribution of events over disease status (present vs. absent), evidence type (positive vs. negative), and information source (medical history vs. laboratory test). Instead, incompatible events are represented in a lower 4 dimensional space using different bases, which must be evaluated sequentially. Bases correspond to different perspectives of a situation. In the medical diagnosis task, the QOEM assumes that medical history and laboratory tests are viewed one at a time from different perspectives. Order effects arise from this process because the linear algebra operations described below are non-commutative. 
 
 ## Basis
 
-The first in defining a quantum model is to determine which events are compatible and which are incompatible. The QOEM assumes information source is incompatible, but disease status and evidence type are compatible. Consequentially, the basis of the QOEM consists of four states corresponding to the all possible combinations of disease status and evidence type:
+The first step in the process of defining a quantum model is to determine which events are compatible and which are incompatible. The QOEM assumes information source is incompatible, but disease status and evidence type are compatible. Consequentially, the basis of the QOEM consists of four states corresponding to the all possible combinations of disease status and evidence type:
 
 1. disease present (p) and positive evidence for disease (p)
 2. disease present (p) and negative evidence for disease (n)
@@ -137,41 +137,46 @@ $\mathbf{H}_{A_k} = \frac{1}{\sqrt{1 + \mu_k^2}}\begin{bmatrix}
 
 This selection describes the process of selecting an action and determining the defection probability. The time evolution is governed by the unitary transformation matrix which is given by:
 
-$\mathbf{U}_h= e^{-i \cdot t \cdot  \mathbf{H}_p},$
+$\mathbf{U}_h= e^{-i \cdot t \cdot  \mathbf{H}_h},$
 
-$\mathbf{U}_l = e^{-i \cdot t \cdot  \mathbf{H}_n},$
-
+$\mathbf{U}_l = e^{-i \cdot t \cdot  \mathbf{H}_l},$
 
 ## QOEM Predictions
 
-First, we will compute the probability the disease is present before evidence from the tests is presented. The probability is the same for both orders. The computation involves projecting the intial state onto the sub-space spanning disease present and squaring the magnitude of the projection, which is computed as:
+In this section, we go through the steps for computing the predictions in the condition in which the medical history is provided followed by the laboratory test. The predictions follow a similar procedure in the condition in which the order of evidence is reversed.
+
+### Assessment Without Evidence Sources
+
+First, we will compute the probability that the disease is present before additional evidence is collected from medical history and laboratory tests. The computation involves projecting the intial state onto the 2D sub-space spanning disease present and squaring the magnitude of the projection, which is computed as:
 
 $\Pr(D=d) = \lVert \mathbf{P}_d \ket{\psi} \rVert^2.$
 
-Next, suppose we update the assessment of the disease given positive evidence from test $i$ is found. The process involves three computations: (1) projecting the initial state onto the positive evidence sub-space, (2) normalizing the state vector, and (3) projecting the new state onto the sub-space spanning disease present. To update the state, we first project onto the sub-space representing positive evidence.
+### Assessment With Medical History
+Next, suppose we update the assessment of the disease given positive evidence from test $i$ is found. The process involves three computations: (1) projecting the initial state onto the positive evidence sub-space, (2) normalizing the state vector, and (3) projecting the new state onto the 2D sub-space spanning disease present. To update the state, we first project onto the sub-space representing medical history.
 
 $\ket{\psi_p^\prime} = \mathbf{P}_p \mathbf{U}_h\ket{\psi}.$ 
 
-Note that he unitary matrix $\mathbf{U}_p$ changes the system to the basis for positive evidence. After projecting on to the sub-space for positive evidence, the state collapses to the positive evidence sub-space because the evidence from the first test is \emph{known}$ to be positive. As a result, the new state must be normalized such that the squared magnitude is 1:
+Note that he unitary matrix $\mathbf{U}_p$ changes the system to the basis for medical history. After projecting on to the 2D sub-space for positive, the state collapses onto that sub-space. As a result, the new state must be normalized such that the squared magnitude is 1:
 
 $\ket{\psi_p} = \frac{\ket{\psi_p^\prime}}{\lVert \ket{\psi_p^\prime} \rVert}.$ 
 
-The last step involves projecting onto the sub-space spanning disease present and squaring the magnitude to obtain the revised probability judgment for the disease:
+The last step involves projecting onto the 2D sub-space spanning disease present and squaring the magnitude to obtain the revised probability judgment for the disease:
 
-$\Pr(D=d \mid E_i = 1) = \lVert \mathbf{P}_d \ket{\psi_p} \rVert^2.$
+$\Pr(D=d \mid S_i = 1) = \lVert \mathbf{P}_d \ket{\psi_p} \rVert^2.$
 
-Next, negative evidence is presented from the second test. A similar sequence of steps is followed. The first step involves projecting onto the sub-space spanned by negative evidence: 
+### Assessment With Medical History and Laboratory Test 
 
-$\ket{\psi_{pn}^\prime} = \mathbf{P}_n \mathbf{U}_l \mathbf{U}_p^\dagger \ket{\psi_p}.$ 
+Next, negative evidence is presented from the laboratory test. A similar sequence of steps is followed. The first step involves projecting onto the 2D sub-space spanned by negative evidence: 
 
-Notice that the process of changing bases involves an extra step. Because the model is currently in the positive evidence basis, it is necessary to perform the inverse operation with the conjugate transpose $\mathbf{U}_p^\dagger$ and then switch to the basis for negative evidence with $\mathbf{U}_l$. As before, the state collapses to negative evidence because negative evidence was observed. Thus, the state must be normalized:
+$\ket{\psi_{pn}^\prime} = \mathbf{P}_n \mathbf{U}_l \mathbf{U}_h^\dagger \ket{\psi_p}.$ 
+
+Notice that the process of changing bases involves an extra step. Because the model state is currently in the positive medical history basis, it is necessary to perform the inverse operation with the conjugate transpose $\mathbf{U}_h^\dagger$ and then switch to the basis for the laboratory test with $\mathbf{U}_l$. As before, the state collapses to negative evidence because negative evidence was observed. Thus, the state must be normalized:
 
 $\ket{\psi_{pn}} = \frac{\ket{\psi_{pn}^\prime}}{\lVert \ket{\psi_{pn}^\prime} \rVert}.$ 
 
-Now that the state is in the sub-space for negative evidence, the last step involves projecting onto the 
-disease present sub-space to obtain a probability judgment for the presense of the disease:
+Now that the state is in the sub-space for negative evidence, the last step involves projecting onto the 2D sub-space for disease present to obtain a probability judgment for the presense of the disease:
 
-$\Pr(D=d \mid E_i = 1, E_j=-1) = \lVert \mathbf{P}_d \ket{\psi_{pn}} \rVert^2.$
+$\Pr(D=d \mid S_i = 1, S_j=-1) = \lVert \mathbf{P}_d \ket{\psi_{pn}} \rVert^2.$
 
 
 
