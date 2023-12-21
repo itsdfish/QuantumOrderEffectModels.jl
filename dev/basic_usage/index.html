@@ -19,26 +19,26 @@ predict(model)</code></pre><pre class="documenter-example-output"><code class="n
 n_trials = 100
 model = QOEM(;Ψ, γₕ, γₗ, σ)
 data = rand(model, n_trials)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">100-element Vector{Vector{Float64}}:
- [0.7489667134315956, 0.8559412599165384, 0.03354011323365798, 0.7760443019769494, 0.3322731682849773, 0.2171699216526756]
- [0.7650502353781903, 0.9434423719776478, 0.058916601022953485, 0.746909296936359, 0.39285938997560566, 0.2561535134583511]
- [0.7427255887140156, 0.9230095419277706, 0.08679047884340242, 0.643723867981969, 0.4283283939778826, 0.20497240384619086]
- [0.7434748660608728, 0.9350464054287094, 0.04058524242005673, 0.6545409151717697, 0.44032206768573356, 0.22085203028753764]
- [0.7064983462920459, 0.8760379211543705, 0.07904197703010978, 0.7850168919289481, 0.3969505100782107, 0.275757856566911]
- [0.6331247398811511, 0.901804640634122, 0.04019324600859262, 0.725374549812511, 0.44933345772394573, 0.20746051569247684]
- [0.683366343568024, 0.8635984978074184, 0.09673475842138618, 0.6260171907691805, 0.39249752410754923, 0.21244214930336927]
- [0.6954372259130173, 0.7335176901789309, 0.01399563494848768, 0.7261583042444429, 0.463468024181286, 0.30019781025730946]
- [0.6225237912583038, 0.9372125663438242, 0.024188061906487347, 0.7663686138673493, 0.40816862674069526, 0.29508591776572257]
- [0.6986638168280198, 0.9177594560988388, 0.07739495660852534, 0.7281382355881216, 0.43323198957006437, 0.20727148242319035]
+ [0.6273795626446796, 0.8179998927903549, 0.039717106209724955, 0.8031450623402714, 0.47665274234877164, 0.21030108986231383]
+ [0.6532625060436333, 0.8377236688199007, 0.16790113084977953, 0.6911632732003148, 0.3995749132305927, 0.23926706441355797]
+ [0.6570500961636451, 0.9311760827260628, 0.19844513272545294, 0.6912355964918098, 0.4030919994945621, 0.16361152626751568]
+ [0.7149389779919723, 0.8462513941986975, 0.054891055566366594, 0.5692906377760361, 0.4039415169259851, 0.23350097367966216]
+ [0.6571743963345756, 0.8265361553953736, 0.047600025257683, 0.688027367778814, 0.43898927503145585, 0.21123222473748518]
+ [0.5925011802274918, 0.8336117099430698, 0.04547782525554089, 0.7309678433248645, 0.37990893871735276, 0.31822355069178165]
+ [0.7439626222408414, 0.7884536749070012, 0.16452078157758107, 0.7413428891450511, 0.4107118942178496, 0.18158954912792613]
+ [0.7272278649305628, 0.8427531907698065, 0.060459771940138796, 0.7563195776323615, 0.39320695163600144, 0.1827740359142372]
+ [0.8035678120015882, 0.9162851143969978, 0.16680048618667848, 0.69491735842652, 0.3927263579584582, 0.274183629505294]
+ [0.6939646442057961, 0.8636090913145721, 0.05754465071513307, 0.7250064994653062, 0.422401553393027, 0.24049267743836428]
  ⋮
- [0.6961882126370874, 0.831444356977245, 0.05152798908410269, 0.6832880389550227, 0.38672976570167894, 0.29240019063882344]
- [0.8010334486337131, 0.9109571060424638, 0.04002427685062242, 0.6005766470288328, 0.47023100942230794, 0.14846193509370123]
- [0.7320704559308882, 0.8650401592556854, 0.046655091531999364, 0.6668857285119191, 0.38067812346440405, 0.27099965873298454]
- [0.7256256465213002, 0.8890953498749864, 0.0682602764682886, 0.6777532787814451, 0.4367732246265845, 0.24003235484482432]
- [0.7300936970974361, 0.8806157316463855, 0.023506769547322944, 0.7021261510715107, 0.43806241672833107, 0.2263114040551014]
- [0.6284127639220164, 0.8821135706782779, 0.07230201009873344, 0.7766694956709983, 0.4318922355657612, 0.24225120433856243]
- [0.6546411017829685, 0.8343835181588996, 0.07146803425498724, 0.7854418862541548, 0.4450524437122185, 0.2297812433571768]
- [0.7584776229301798, 0.9323662163582379, 0.07233798760963685, 0.7050293940596393, 0.43241281403104603, 0.28728314888494993]
- [0.6609829440797045, 0.8075251677888524, 0.022644040081792695, 0.669727339500362, 0.4574606298937742, 0.2063516071697953]</code></pre><h1 id="Evaluate-Log-Likelihood"><a class="docs-heading-anchor" href="#Evaluate-Log-Likelihood">Evaluate Log Likelihood</a><a id="Evaluate-Log-Likelihood-1"></a><a class="docs-heading-anchor-permalink" href="#Evaluate-Log-Likelihood" title="Permalink"></a></h1><p>The log likelihood of data can be evaluated using <code>logpdf</code>. In the code block below, we generate simulated data and evaluate the logpdf: </p><pre><code class="language-julia hljs">using QuantumOrderEffectModels
+ [0.5978087933460312, 0.9204952290592453, 0.06851825088513451, 0.674279864380051, 0.45075590868547016, 0.16160003552506602]
+ [0.7154413772629139, 0.8708466301071562, 0.16319875160084407, 0.7185388584728719, 0.4199914783973041, 0.1770005987175638]
+ [0.7111282429916107, 0.9067725278332316, 0.04536954597240859, 0.7844135353480138, 0.3826665693312404, 0.16682887747789238]
+ [0.6430050224296838, 0.8342541946682585, 0.10764027074069307, 0.6359644817218134, 0.38545457685415585, 0.20507676868108135]
+ [0.7082824797198034, 0.8863978396889796, 0.0625875755278647, 0.7166584124281994, 0.4273510483876453, 0.17422986719422653]
+ [0.7252203601969079, 0.8596121755587234, 0.023978830343476597, 0.6141557529884655, 0.3989017656703576, 0.24518456835140326]
+ [0.6561034188298908, 0.8371983943416177, 0.024322943020743365, 0.6627102747217353, 0.3652823479892929, 0.1484975235634311]
+ [0.6278210825133862, 0.8784195678572709, 0.11954336688277935, 0.6919964354604219, 0.3219467492733085, 0.32485945328028887]
+ [0.7203986844765813, 0.8874623232157762, 0.06777334750944133, 0.6944699400755449, 0.3637820532221349, 0.2942999943342877]</code></pre><h1 id="Evaluate-Log-Likelihood"><a class="docs-heading-anchor" href="#Evaluate-Log-Likelihood">Evaluate Log Likelihood</a><a id="Evaluate-Log-Likelihood-1"></a><a class="docs-heading-anchor-permalink" href="#Evaluate-Log-Likelihood" title="Permalink"></a></h1><p>The log likelihood of data can be evaluated using <code>logpdf</code>. In the code block below, we generate simulated data and evaluate the logpdf: </p><pre><code class="language-julia hljs">using QuantumOrderEffectModels
 Ψ = @. √([.35,.35,.15,.15])
 γₕ = 2
 γₗ = .5
@@ -46,4 +46,4 @@ data = rand(model, n_trials)</code></pre><pre class="documenter-example-output">
 n_trials = 100
 model = QOEM(;Ψ, γₕ, γₗ, σ)
 data = rand(model, n_trials)
-logpdf(model, data)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">981.4529431028823</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../model_description/">Model Description »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.2.1 on <span class="colophon-date" title="Sunday 17 December 2023 13:15">Sunday 17 December 2023</span>. Using Julia version 1.9.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+logpdf(model, data)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">950.7569893515146</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../model_description/">Model Description »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.2.1 on <span class="colophon-date" title="Thursday 21 December 2023 09:12">Thursday 21 December 2023</span>. Using Julia version 1.9.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
