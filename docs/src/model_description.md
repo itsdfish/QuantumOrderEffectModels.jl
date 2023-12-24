@@ -119,27 +119,36 @@ As before, the projector spans the 2D sub-space in which negative evidence is di
 
 ## Hamiltonian Matrices
 
-Hamiltonian matrices govern the decision dynamics of the model. The Hamiltonian matrix $\mathbf{H}$ consists of two components: $\mathbf{H}_A$ is sensitive to the payoff matrix, and $\mathbf{H}_B$ is sensitive to cognitive dissonance between beliefs and actions. The component $\mathbf{H}_A$ is defined as follows: 
+Hamiltonian matrices govern the decision dynamics of the model. The Hamiltonian matrix $\mathbf{H}(\gamma)$ consists of two components: $\mathbf{H}_1$ is sensitive to the payoff matrix, and $\mathbf{H}_2$ is sensitive to cognitive dissonance between beliefs and actions. The component $\mathbf{H}_1$ is defined as follows: 
 
-$\mathbf{H}_A = \begin{bmatrix}		
-	\mathbf{H}_{A_d} & \mathbf{0}\\
-	\mathbf{0} & \mathbf{H}_{A_c}\\
-\end{bmatrix},$
-where
+$\mathbf{H}_1 = I_2 \otimes \begin{bmatrix}		
+	1 & 1\\
+	1 & -1\\
+\end{bmatrix} = \begin{bmatrix}		
+	1 & 1 & 0 & 0\\
+	1 & -1 & 0 & 0\\
+	0 &  0 & 1 & 1\\
+	0 & 0 & 1 & -1\\
+\end{bmatrix}$
 
-$\mathbf{H}_{A_k} = \frac{1}{\sqrt{1 + \mu_k^2}}\begin{bmatrix}		
-	\mu_k & 1\\
-	1 & -\mu_k\\
+The second component is defined as:
+
+$\mathbf{H}_{2} = \begin{bmatrix}		
+	1 & 0 & 1 & 0\\
+	0 & -1 & 0 & 1\\
+	1 &  0 & -1 & 0\\
+	0 & 1 & 0 & 1\\
 \end{bmatrix}.$
 
+$\mathbf{H} = \frac{1}{\sqrt{2}}\left(\mathbf{H}_1 + \mathbf{H}_2 \right)$
 
 ## Evidence Evaluation
 
 This selection describes the process of selecting an action and determining the defection probability. The time evolution is governed by the unitary transformation matrix which is given by:
 
-$\mathbf{U}_h= e^{-i \cdot t \cdot  \mathbf{H}_h},$
+$\mathbf{U}_h= e^{-i \cdot t \cdot \gamma_h \cdot \mathbf{H}},$
 
-$\mathbf{U}_l = e^{-i \cdot t \cdot  \mathbf{H}_l},$
+$\mathbf{U}_l = e^{-i \cdot t \cdot  \gamma_l \cdot \mathbf{H}},$
 
 ## QOEM Predictions
 
@@ -180,13 +189,33 @@ $\Pr(D=d \mid S_i = 1, S_j=-1) = \lVert \mathbf{P}_d \ket{\psi_{pn}} \rVert^2.$
 
 
 
-|  Condition   | Formula    | Data | Model |
-| :-- | :-- | :-- | :-- |
-|  1   |  $\Pr(R_1=d \mid R_2=d)$   | .84| .81|
-|  2  |   $\Pr(R_1=d \mid R_2=c)$   | .66| .65|
-|  3   |  $\Pr(R_1=d)$  | .55 | .57|
+| Evidence 	| Data  	| Model 	|
+|----------	|-------	|-------	|
+|          	| 0.674 	| 0.676 	|
+| H        	| 0.778 	| 0.793 	|
+| H,L      	| 0.509 	| 0.504 	|
+|          	| 0.678 	| 0.676 	|
+| L        	| 0.440 	| 0.437 	|
+| L,H      	| 0.591 	| 0.590 	|
 
 The code used to generate the predictions can be viewed by expanding the code block below:
+
+```@raw html
+<details>
+<summary><b>Show Code</b></summary>
+```
+```@example model_preds
+using QuantumOrderEffectModels
+Ψ = [√(.676 / 2),√(.676 / 2),√(.324 / 2),√(.324 / 2)]
+γₕ = 4.4045 / √(.5)
+γₗ = 0.3306 / √(.5)
+σ = .10
+model = QOEM(;Ψ, γₕ, γₗ, σ)
+predict(model)
+```
+```@raw html
+</details>
+```
 
 ### Dynamics 
 
